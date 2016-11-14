@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 import android.widget.*;
 import android.view.*;
 import java.util.*;
+import android.graphics.*;
+import java.nio.*;
 
 public class MainActivity extends Activity 
 {
@@ -23,6 +25,17 @@ public class MainActivity extends Activity
 		tv.setText("\n\n\n\n\n");
 		new Cpu().start();
     }
+	public void updatebmp(Bitmap bmp)
+	{
+		final Bitmap bmp2 = Bitmap.createBitmap(bmp);
+		runOnUiThread(new Runnable(){
+				@Override
+				public void run()
+				{
+					bmp2.recycle();
+				}
+			});
+	}
 	void out(String str)
 	{
 		final String str2 = str;
@@ -92,6 +105,7 @@ public class MainActivity extends Activity
 		byte[] key;
 		byte[] chip8_fontset;
 		Random random;
+		Bitmap bmp;
 		public Chip8() throws Exception
 		{
 			random = new Random();
@@ -121,19 +135,18 @@ public class MainActivity extends Activity
 			opcode = 0;      // Reset current opcode	
 			I      = 0;      // Reset index register
 			sp     = 0;      // Reset stack pointer
-
 			key = new byte[16];
 			vram = new byte[64*32];
 			stack = new short[16];
 			V = new byte[16];
 			memory = new byte[4096];
-
 			// Load fontset
 			for(int i = 0; i < 80; ++i)
 				memory[i] = chip8_fontset[i];		
-
 			delay_timer = 0;
 			sound_timer = 0;
+			bmp = Bitmap.createBitmap(64,32,Bitmap.Config.ALPHA_8);
+			update();
 		}
 		void load(String file) throws Exception
 		{
@@ -244,10 +257,10 @@ public class MainActivity extends Activity
 					undefined();
 			}
 		}
-
 		private void update()
 		{
-			// TODO: Implement this method
+			bmp.copyPixelsFromBuffer(ByteBuffer.wrap(vram));
+			updatebmp(bmp);
 		}
 		private void undefined() throws Exception
 		{
