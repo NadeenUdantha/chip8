@@ -165,34 +165,68 @@ public class MainActivity extends Activity
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0xD000:
+					{
+						short x = V[(opcode & 0x0F00) >> 8];
+						short y = V[(opcode & 0x00F0) >> 4];
+						short height = (short)(opcode & 0x000F);
+						short pixel;
+						V[0x0F] = 0;
+						for (int yline = 0; yline < height; yline++)
+						{
+							pixel = memory[I + yline];
+							for(int xline = 0; xline < 8; xline++)
+							{
+								if((pixel & (0x80 >> xline)) != 0)
+								{
+									if(vram[(x + xline + ((y + yline) * 64))] == 1)
+									{
+										V[0x0F] = 1;                                    
+									}
+									vram[x + xline + ((y + yline) * 64)] ^= 1;
+								}
+							}
+						}
+						update();
+						debug("vram[%d,%d]*%d and V[0x0F] == %b)\n",x,y,height,V[0x0F]);
+						break;
+					}
 				case 0x3000:
-					byte src2 = (byte)((opcode & 0x0F00) >> 8);
-					src = V[src2];
-					dest = (byte)(opcode & 0x00FF);
-					boolean result2 = src == dest;
-					if(result2)
-						pc += 2;
-					debug("if(V%X(%02X) == 0x%02X == %b)jmp $+2\n",src2,src,dest,result2);
-					break;
+					{
+						byte src2 = (byte)((opcode & 0x0F00) >> 8);
+						src = V[src2];
+						dest = (byte)(opcode & 0x00FF);
+						boolean result = src == dest;
+						if(result)
+							pc += 2;
+						debug("if(V%X(%02X) == 0x%02X == %b)jmp $+2\n",src2,src,dest,result);
+						break;
+					}
 				case 0xC000:
-					src = (byte)(opcode & 0x00FF);
-					dest = (byte)((opcode & 0x0F00) >> 8);
-					byte rand = (byte)random.nextInt(256);
-					byte result = (byte)(rand & src);
-					V[dest] = result;
-					debug("V%X = 0x%02X & 0x%02X = 0x%02X\n",dest,rand,src,result);
-					break;
+					{
+						src = (byte)(opcode & 0x00FF);
+						dest = (byte)((opcode & 0x0F00) >> 8);
+						byte rand = (byte)random.nextInt(256);
+						byte result = (byte)(rand & src);
+						V[dest] = result;
+						debug("V%X = 0x%02X & 0x%02X = 0x%02X\n",dest,rand,src,result);
+						break;
+					}
 				case 0xA000:
-					src = (short)(opcode & 0x0FFF);
-					I = src;
-					debug("I = 0x%03X\n",src);
-					break;
+					{
+						src = (short)(opcode & 0x0FFF);
+						I = src;
+						debug("I = 0x%03X\n",src);
+						break;
+					}
 				case 0x6000:
-					src =  (byte)(opcode & 0x00FF);
-					dest = (byte)((opcode & 0x0F00) >> 8);
-					V[dest] = (byte)src;
-					debug("V%X = 0x%02X\n",dest,src);
-					break;
+					{
+						src =  (byte)(opcode & 0x00FF);
+						dest = (byte)((opcode & 0x0F00) >> 8);
+						V[dest] = (byte)src;
+						debug("V%X = 0x%02X\n",dest,src);
+						break;
+					}
 				case 0xF000:
 					switch(opcode & 0x00FF)
 					{
@@ -209,6 +243,11 @@ public class MainActivity extends Activity
 				default:
 					undefined();
 			}
+		}
+
+		private void update()
+		{
+			// TODO: Implement this method
 		}
 		private void undefined() throws Exception
 		{
