@@ -156,14 +156,19 @@ public class MainActivity extends Activity
 		}
 		private void exec() throws Exception
 		{
-			byte src;
-			byte dest;
+			short src = 0;
+			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0xA000:
+					src = (short)(opcode & 0x0FFF);
+					I = src;
+					debug("I = 0x%03X\n",src);
+					break;
 				case 0x6000:
 					src =  (byte)(opcode & 0x00FF);
 					dest = (byte)((opcode & 0x0F00) >> 8);
-					V[dest] = src;
+					V[dest] = (byte)src;
 					debug("V%X = 0x%02X\n",dest,src);
 					break;
 				case 0xF000:
@@ -171,7 +176,7 @@ public class MainActivity extends Activity
 					{
 						case 0x0015:
 							src =  (byte)(opcode & 0x0F00);
-							delay_timer = src;
+							delay_timer = (byte)src;
 							debug("delay_timer = 0x%02X\n",src);
 							break;
 						default:
