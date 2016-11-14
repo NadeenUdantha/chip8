@@ -15,6 +15,7 @@ public class MainActivity extends Activity
 {
 	private TextView tv;
 	private ScrollView sv;
+	private ImageView iv;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -22,17 +23,19 @@ public class MainActivity extends Activity
         setContentView(R.layout.main);
 		tv = (TextView)findViewById(R.id.mainTextView);
 		sv = (ScrollView)findViewById(R.id.mainScrollView);
+		iv = (ImageView)findViewById(R.id.mainImageView);
 		tv.setText("\n\n\n\n\n");
 		new Cpu().start();
     }
 	public void updatebmp(Bitmap bmp)
 	{
-		final Bitmap bmp2 = Bitmap.createBitmap(bmp);
+		final Bitmap bmp2 = bmp;
 		runOnUiThread(new Runnable(){
 				@Override
 				public void run()
 				{
-					bmp2.recycle();
+					iv.setScaleType(ImageView.ScaleType.CENTER);
+					iv.setImageBitmap(bmp2);
 				}
 			});
 	}
