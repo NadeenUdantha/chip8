@@ -7,6 +7,7 @@ import java.lang.reflect.*;
 import java.util.concurrent.*;
 import android.widget.*;
 import android.view.*;
+import java.util.*;
 
 public class MainActivity extends Activity 
 {
@@ -77,6 +78,7 @@ public class MainActivity extends Activity
 	}
 	class Chip8
 	{
+		// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 		short opcode;
 		short I;
 		short pc;
@@ -89,8 +91,10 @@ public class MainActivity extends Activity
 		byte[] V;
 		byte[] key;
 		byte[] chip8_fontset;
+		Random random;
 		public Chip8() throws Exception
 		{
+			random = new Random();
 			chip8_fontset = new byte[80];
 			/*{ 
 			 0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -154,12 +158,21 @@ public class MainActivity extends Activity
 				sound_timer--;
 			}
 		}
+		// https://en.m.wikipedia.org/wiki/CHIP-8
 		private void exec() throws Exception
 		{
 			short src = 0;
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0xC000:
+					src = (byte)(opcode & 0x00FF);
+					dest = (byte)((opcode & 0x0F00) >> 8);
+					byte rand = (byte)random.nextInt(256);
+					byte result = (byte)(rand & src);
+					V[dest] = result;
+					debug("V%X = 0x%02X & 0x%02X = 0x%02X\n",dest,rand,src,result);
+					break;
 				case 0xA000:
 					src = (short)(opcode & 0x0FFF);
 					I = src;
