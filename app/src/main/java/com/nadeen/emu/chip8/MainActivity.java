@@ -165,6 +165,15 @@ public class MainActivity extends Activity
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0x3000:
+					byte src2 = (byte)((opcode & 0x0F00) >> 8);
+					src = V[src2];
+					dest = (byte)(opcode & 0x00FF);
+					boolean result2 = src == dest;
+					if(result2)
+						pc += 2;
+					debug("if(V%X(%02X) == 0x%02X == %b)jmp $+2\n",src2,src,dest,result2);
+					break;
 				case 0xC000:
 					src = (byte)(opcode & 0x00FF);
 					dest = (byte)((opcode & 0x0F00) >> 8);
