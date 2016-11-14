@@ -59,7 +59,7 @@ public class MainActivity extends Activity
 				out("loading.....\n");
 				cpu = new Chip8();
 				cpu.initialize();
-				cpu.load("/sdcard/c8/pong");
+				cpu.load("/sdcard/c8/maze");
 				Thread.sleep(1000);
 			}
 			catch (Exception e){out(e);}
@@ -156,16 +156,36 @@ public class MainActivity extends Activity
 		}
 		private void exec() throws Exception
 		{
+			byte src;
+			byte dest;
 			switch(opcode & 0xF000)
 			{
 				case 0x6000:
-					byte src =  (byte)(opcode & 0x00FF);
-					byte dest = (byte)((opcode & 0x0F00) >> 8);
+					src =  (byte)(opcode & 0x00FF);
+					dest = (byte)((opcode & 0x0F00) >> 8);
+					V[dest] = src;
 					debug("V%X = 0x%02X\n",dest,src);
 					break;
+				case 0xF000:
+					switch(opcode & 0x00FF)
+					{
+						case 0x0015:
+							src =  (byte)(opcode & 0x0F00);
+							delay_timer = src;
+							debug("delay_timer = 0x%02X\n",src);
+							break;
+						default:
+							undefined();
+							break;
+					}
+					break;
 				default:
-					debug("Unknown opcode at 0x%04X 0x%04X\n",pc,opcode);
+					undefined();
 			}
+		}
+		private void undefined() throws Exception
+		{
+			debug("Unknown opcode at 0x%04X 0x%04X\n",pc,opcode);
 		}
 		void debug(String fmt,Object...args) throws Exception
 		{
