@@ -46,7 +46,9 @@ public class MainActivity extends Activity
 				@Override
 				public void run()
 				{
-					tv.setText(tv.getText().subSequence(0,tv.getText().length()-5)+str2+"\n\n\n\n\n");
+					String str3 = tv.getText().subSequence(0,tv.getText().length()-5)+str2+"\n\n\n\n\n";
+					if(str3.length() > 4096)str3 = str3.substring(512);
+					tv.setText(str3);
 					sv.fullScroll(View.FOCUS_DOWN);
 				}
 			});
@@ -181,6 +183,15 @@ public class MainActivity extends Activity
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0x2000:
+				{
+					stack[sp] = pc;
+					dest = (short)(opcode & 0x0FFF);
+					pc = dest;
+					debug("stack[0x%02X] = 0x%03X and jmp 0x%03X",sp,dest,dest);
+					sp++;
+					break;
+				}
 				case 0x8000:
 				{
 					switch(opcode & 0x000F)
