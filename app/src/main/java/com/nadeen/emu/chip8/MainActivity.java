@@ -84,7 +84,7 @@ public class MainActivity extends Activity
 			{
 				try
 				{
-					Thread.sleep(1000);
+					Thread.sleep(50);
 					cpu.emulate();
 				}
 				catch (Exception e)
@@ -181,6 +181,29 @@ public class MainActivity extends Activity
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0x8000:
+				{
+					switch(opcode & 0x000F)
+					{
+						case 0x0000:
+							byte src2 = (byte)((opcode & 0x00F0) >> 4);
+							src = V[src2];
+							byte dest2 = (byte)((opcode & 0x0F00) >> 8);
+							dest = V[dest2];
+							V[dest2] = (byte)src;
+							debug("V%X(0x%02X) = V%X(0x%02X)",dest2,dest,src2,src);
+							break;
+						default:
+							undefined();
+					}
+					break;
+				}
+				case 0x1000:
+				{
+					pc = (short)(opcode & 0x0FFF);
+					debug("jmp 0x%03X\n",pc);
+					break;
+				}
 				case 0x7000:
 				{
 					src = (byte)(opcode & 0x00FF);
@@ -285,6 +308,7 @@ public class MainActivity extends Activity
 		private void undefined() throws Exception
 		{
 			debug("Unknown opcode at 0x%04X 0x%04X\n",pc,opcode);
+			Thread.sleep(10000);
 		}
 		void debug(String fmt,Object...args) throws Exception
 		{
