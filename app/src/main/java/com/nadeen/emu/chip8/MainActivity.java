@@ -191,7 +191,7 @@ public class MainActivity extends Activity
 							byte dest2 = (byte)((opcode & 0x0F00) >> 8);
 							dest = V[dest2];
 							V[dest2] = (byte)src;
-							debug("V%X(0x%02X) = V%X(0x%02X)",dest2,dest,src2,src);
+							debug("V%X(0x%02X) = V%X(0x%02X)\n",dest2,dest,src2,src);
 							break;
 						default:
 							undefined();
