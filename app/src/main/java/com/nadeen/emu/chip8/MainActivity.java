@@ -24,6 +24,7 @@ public class MainActivity extends Activity
 		tv = (TextView)findViewById(R.id.mainTextView);
 		sv = (ScrollView)findViewById(R.id.mainScrollView);
 		iv = (ImageView)findViewById(R.id.mainImageView);
+		iv.setTop(0);
 		tv.setText("\n\n\n\n\n");
 		new Cpu().start();
     }
@@ -180,6 +181,16 @@ public class MainActivity extends Activity
 			short dest = 0;
 			switch(opcode & 0xF000)
 			{
+				case 0x7000:
+				{
+					src = (byte)(opcode & 0x00FF);
+					dest = (byte)((opcode & 0x0F00) >> 8);
+					byte src2 = V[dest];
+					byte result = (byte)(src2+src);
+					V[dest] = result;
+					debug("V%X(0x%02X) += 0x%02X = 0x%02X)\n",dest,src2,src,result);
+					break;
+				}
 				case 0xD000:
 					{
 						short x = V[(opcode & 0x0F00) >> 8];
