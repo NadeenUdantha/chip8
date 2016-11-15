@@ -34,7 +34,6 @@ public class MainActivity extends Activity
 				@Override
 				public void run()
 				{
-					iv.setScaleType(ImageView.ScaleType.CENTER);
 					iv.setImageBitmap(bmp2);
 				}
 			});
@@ -148,7 +147,7 @@ public class MainActivity extends Activity
 				memory[i] = chip8_fontset[i];		
 			delay_timer = 0;
 			sound_timer = 0;
-			bmp = Bitmap.createBitmap(64,32,Bitmap.Config.ALPHA_8);
+			bmp = Bitmap.createBitmap(64,32,Bitmap.Config.ARGB_8888);
 			update();
 		}
 		void load(String file) throws Exception
@@ -262,7 +261,14 @@ public class MainActivity extends Activity
 		}
 		private void update()
 		{
-			bmp.copyPixelsFromBuffer(ByteBuffer.wrap(vram));
+			for(int x = 0;x < 64;x++)
+				for(int y = 0;y < 32;y++)
+				{
+					int c = Color.BLACK;
+					if(vram[x+(y*32)] == 0)
+						c = Color.WHITE;
+					bmp.setPixel(x,y,c);
+				}
 			updatebmp(bmp);
 		}
 		private void undefined() throws Exception
