@@ -78,7 +78,7 @@ public class MainActivity extends Activity
 				out("loading.....\n");
 				cpu = new Chip8();
 				cpu.initialize();
-				cpu.load("/sdcard/c8/maze");
+				cpu.load("/sdcard/c8/missile");
 				Thread.sleep(1000);
 			}
 			catch (Exception e){out(e);}
@@ -86,7 +86,7 @@ public class MainActivity extends Activity
 			{
 				try
 				{
-					Thread.sleep(50);
+					Thread.sleep(1000);
 					cpu.emulate();
 				}
 				catch (Exception e)
@@ -164,7 +164,7 @@ public class MainActivity extends Activity
 		}
 		void emulate() throws Exception
 		{
-			opcode = (short)((int)memory[pc] << 8 | (int)memory[pc + 1]);
+			opcode = (short)(memory[pc] << 8 | memory[pc + 1]);
 			exec();
 			pc += 2;
 			if(delay_timer > 0)
@@ -179,6 +179,7 @@ public class MainActivity extends Activity
 		// https://en.m.wikipedia.org/wiki/CHIP-8
 		private void exec() throws Exception
 		{
+			if(true){debug("\n");return;}
 			short src = 0;
 			short dest = 0;
 			switch(opcode & 0xF000)
@@ -188,7 +189,7 @@ public class MainActivity extends Activity
 					stack[sp] = pc;
 					dest = (short)(opcode & 0x0FFF);
 					pc = dest;
-					debug("stack[0x%02X] = 0x%03X and jmp 0x%03X",sp,dest,dest);
+					debug("stack[0x%02X] = 0x%03X and jmp 0x%03X\n",sp,dest,dest);
 					sp++;
 					break;
 				}
@@ -318,12 +319,12 @@ public class MainActivity extends Activity
 		}
 		private void undefined() throws Exception
 		{
-			debug("Unknown opcode at 0x%04X 0x%04X\n",pc,opcode);
+			debug("Unknown opcode: 0x%04X\n",pc,opcode);
 			Thread.sleep(10000);
 		}
 		void debug(String fmt,Object...args) throws Exception
 		{
-			out(String.format(fmt, args));
+			out(String.format("[0x%04X] = 0x%04X %s",pc,opcode,String.format(fmt, args)));
 		}
 	}
 }
